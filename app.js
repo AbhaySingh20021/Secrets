@@ -7,6 +7,8 @@ const ejs = require("ejs");
 const mongoose = require("mongoose");
 var encrypt = require('mongoose-encryption');
 const md5 = require("md5");
+const bcrypt = require("bcrypt");
+const saltRounds = 10;
 
 
 
@@ -37,29 +39,32 @@ const userScheme = new mongoose.Schema ({
     email: String , password : String
 });
 
-//console.log( process.env.SECRET);
+console.log( process.env.SECRET);
 
 
-//userScheme.plugin(encrypt, { secret: process.env.SECRET , encryptedFields: ["password"]});
+///userScheme.plugin(encrypt, { secret: process.env.SECRET , encryptedFields: ["password"]});
 
 
 const user = new mongoose.model("User" , userScheme);
 
 app.post("/register" , function ( req , res){
-    const newUser = new user ({
-        email: req.body.username , password: req.body.password
+
+    bcrypt.hash(req.body.password, saltRounds, function(err, hash) {
+        const newUser = new user ({
+            email: req.body.username , password: hash
+        });
+        newUser.save( function (err) {
+            if(err){
+                console.log(err);
+            }
+            else {
+                res.render("secrets");
+            }
+            
+        } );
+        // Store hash in your password DB.
     });
 
-    newUser.save( function (err) {
-        if(err){
-            console.log(err);
-        }
-        else {
-            res.render("secrets");
-        }
-        
-    } );
-    
     
 });
 
@@ -73,14 +78,24 @@ app.post("/login" , function (req, res) {
      }
          else {
              if(result){
-                 if(result.password === password){
-                     res.render("secrets");
-                     console.log("user found");
-                 }
-                 else {
-                     alert("No user found");
-                 }
+                bcrypt.compare(password, result.password, function(err, result1) {
+                    console.log(result1);
+
+                    if(result1 == true ){
+                        res.render("secrets");
+                        console.log("user found");
+                    }
+                    
+
+                   
+                    // result == true
+                });
+                     
+                
              }
+             else
+             alert("No user found");
+            
          }
      
      
@@ -91,6 +106,9 @@ app.post("/login" , function (req, res) {
 
     
 });
+
+
+
 
 
 app.listen(3000 , function () {
