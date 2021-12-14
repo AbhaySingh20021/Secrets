@@ -6,6 +6,7 @@ const bodyParser= require("body-parser");
 const ejs = require("ejs");
 const mongoose = require("mongoose");
 var encrypt = require('mongoose-encryption');
+const md5 = require("md5");
 
 
 
