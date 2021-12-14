@@ -37,10 +37,10 @@ const userScheme = new mongoose.Schema ({
     email: String , password : String
 });
 
-console.log( process.env.SECRET);
+//console.log( process.env.SECRET);
 
 
-userScheme.plugin(encrypt, { secret: process.env.SECRET , encryptedFields: ["password"]});
+//userScheme.plugin(encrypt, { secret: process.env.SECRET , encryptedFields: ["password"]});
 
 
 const user = new mongoose.model("User" , userScheme);
@@ -91,9 +91,6 @@ app.post("/login" , function (req, res) {
 
     
 });
-
-
-
 
 
 app.listen(3000 , function () {
